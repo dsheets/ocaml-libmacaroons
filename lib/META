@@ -1,0 +1,6 @@
+version = "0.0.0"
+description = "Binding to libmacaroons, a flexible authorization token system"
+requires = "bigarray ctypes.foreign bytes"
+archive(byte) = "libmacaroons.cma"
+archive(native) = "libmacaroons.cmxa"
+exists_if = "libmacaroons.cma"

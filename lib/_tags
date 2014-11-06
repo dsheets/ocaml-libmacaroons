@@ -1,0 +1,3 @@
+<macaroons_probe.{ml,mli}>: package(ctypes.foreign)
+<libmacaroons.{ml,mli}>: package(bytes), package(ctypes.foreign)
+<libmacaroons.{cma,cmxa}>: use_macaroons
