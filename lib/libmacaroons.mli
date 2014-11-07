@@ -23,10 +23,10 @@ exception ValidationError of int
 exception ThirdPartyCaveatError of int * int
 
 val destroy  : t -> unit
-val create   : string -> string -> string -> t
+val create   : loc:string -> key:string -> id:string -> t
 val validate : t -> unit
 val add_first_party_caveat : t -> string -> t
-val add_third_party_caveat : t -> string -> string -> string -> t
+val add_third_party_caveat : t -> loc:string -> key:string -> id:string -> t
 val num_third_party_caveats : t -> int
 val third_party_caveats : t -> third_party_caveat list
 val prepare_for_request : t -> t -> t

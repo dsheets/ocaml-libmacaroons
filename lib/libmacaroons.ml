@@ -29,6 +29,8 @@ exception LibraryError of string
 exception ValidationError of int
 exception ThirdPartyCaveatError of int * int
 
+let size_0 = Unsigned.Size_t.of_int 0
+
 let returncode = Macaroons_probe.(view
   ~read:returncode_of_code
   ~write:code_of_returncode
@@ -61,15 +63,15 @@ let destroy =
   in
   fun macaroon -> c macaroon
 
-let create : string -> string -> string -> t =
+let create =
   let c = foreign "macaroon_create"
     (string @-> size_t @-> string @-> size_t @-> string @-> size_t
      @-> ptr returncode @-> returning t)
   in
-  fun location key id ->
+  fun ~loc ~key ~id ->
     check_returncode destroy (
       c
-        location (len_size_t location)
+        loc (len_size_t loc)
         key (len_size_t key)
         id (len_size_t id)
     )
@@ -99,10 +101,10 @@ let add_third_party_caveat =
      @-> string @-> size_t @-> string @-> size_t @-> string @-> size_t
      @-> ptr returncode @-> returning t)
   in
-  fun macaroon location key id ->
+  fun macaroon ~loc ~key ~id ->
     check_returncode destroy (
       c macaroon
-        location (len_size_t location)
+        loc (len_size_t loc)
         key (len_size_t key)
         id (len_size_t id)
     )
@@ -125,9 +127,9 @@ let third_party_caveats =
       | n ->
         let n = n - 1 in
         let loc = new_null_ptr_ptr char in
-        let loc_sz = Ctypes.allocate size_t (Unsigned.Size_t.of_int 0) in
+        let loc_sz = Ctypes.allocate size_t size_0 in
         let id = new_null_ptr_ptr char in
-        let id_sz = Ctypes.allocate size_t (Unsigned.Size_t.of_int 0) in
+        let id_sz = Ctypes.allocate size_t size_0 in
         let r = c macaroon n loc loc_sz id id_sz in
         if r < 0
         then raise (ThirdPartyCaveatError (n,r))
@@ -152,7 +154,7 @@ let location =
   in
   fun macaroon ->
     let loc = new_null_ptr_ptr char in
-    let loc_sz = Ctypes.allocate size_t (Unsigned.Size_t.of_int 0) in
+    let loc_sz = Ctypes.allocate size_t size_0 in
     c macaroon loc loc_sz;
     string_from_ptr (!@ loc) ~length:(Unsigned.Size_t.to_int (!@ loc_sz))
 
@@ -162,7 +164,7 @@ let identifier =
   in
   fun macaroon ->
     let id = new_null_ptr_ptr char in
-    let id_sz = Ctypes.allocate size_t (Unsigned.Size_t.of_int 0) in
+    let id_sz = Ctypes.allocate size_t size_0 in
     c macaroon id id_sz;
     string_from_ptr (!@ id) ~length:(Unsigned.Size_t.to_int (!@ id_sz))
 
@@ -172,7 +174,7 @@ let signature =
   in
   fun macaroon ->
     let sign = new_null_ptr_ptr char in
-    let sign_sz = Ctypes.allocate size_t (Unsigned.Size_t.of_int 0) in
+    let sign_sz = Ctypes.allocate size_t size_0 in
     c macaroon sign sign_sz;
     string_from_ptr (!@ sign) ~length:(Unsigned.Size_t.to_int (!@ sign_sz))
 
